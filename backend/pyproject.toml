@@ -1,0 +1,27 @@
+[project]
+name = "app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg",
+    "ddgs",
+    "deepagents",
+    "fastapi[standard]",
+    "httpx",
+    "langchain",
+    "langchain-community",
+    "langchain-core",
+    "langchain-openai",
+    "langgraph",
+    "loguru",
+    "markdownify",
+    "openai",
+    "psycopg2-binary",
+    "pydantic",
+    "pydantic-settings",
+    "python-dotenv",
+    "sqlalchemy",
+    "uvicorn[standard]",
+]

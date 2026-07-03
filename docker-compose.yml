@@ -1,0 +1,67 @@
+services:
+    backend:
+        build: backend
+        container_name: backend
+        env_file:
+            - .env
+        ports:
+            - "8000:8000"
+        working_dir: /app
+        restart: unless-stopped
+        networks:
+            - resume_chef_network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "/opt/venv/bin/python",
+                    "-c",
+                    "import httpx; httpx.get('http://127.0.0.1:8000/health')",
+                ]
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
+        develop:
+            watch:
+                - action: rebuild
+                  path: ./backend/pyproject.toml
+                - action: sync
+                  path: ./backend
+                  target: /app
+                  ignore:
+                      - pyproject.toml
+                      - __pycache__/
+                      - "*.pyc"
+
+    frontend:
+        build:
+            context: frontend
+            target: dev
+        container_name: frontend
+        ports:
+            - "5173:5173"
+        working_dir: /app
+        restart: unless-stopped
+        networks:
+            - resume_chef_network
+        develop:
+            watch:
+                - action: rebuild
+                  path: ./frontend/package.json
+                - action: rebuild
+                  path: ./frontend/package-lock.json
+                - action: sync
+                  path: ./frontend
+                  target: /app
+                  ignore:
+                      - package.json
+                      - package-lock.json
+                      - node_modules/
+                      - dist/
+
+networks:
+    resume_chef_network:
+        driver: bridge

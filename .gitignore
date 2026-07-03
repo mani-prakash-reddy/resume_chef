@@ -1,0 +1,133 @@
+# --- Environment & secrets ---
+.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+!**/env.local.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env.bak
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+pip-log.txt
+pip-delete-this-directory.txt
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.mo
+*.pot
+dmypy.json
+.pyre/
+.pytype/
+cython_debug/
+
+# --- Node / React ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# Build output
+/build
+/dist
+/out
+.next/
+.nuxt/
+.output/
+.parcel-cache/
+.vite/
+*.local
+
+# React / Next.js
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+.turbo
+.eslintcache
+.stylelintcache
+
+# Testing
+/coverage
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# --- Editors & IDEs ---
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# VS Code (keep shared settings if desired)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# --- Logs & temp ---
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# --- Docker (local overrides) ---
+docker-compose.override.yml
