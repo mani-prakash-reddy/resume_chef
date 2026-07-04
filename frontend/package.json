@@ -9,11 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@supabase/supabase-js": "^2.110.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.511.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.8",
     "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.1.8",
     "vite": "^8.1.3"
   }
 }

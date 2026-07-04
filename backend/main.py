@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from loguru import logger
 from database.database import init_db
 from config import settings
+from auth.router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -33,6 +34,9 @@ async def validation_exception_handler(request, exc):
         status_code=422,
         content={"detail": exc.errors(), "body": exc.body},
     )
+
+app.include_router(auth_router)
+
 
 @app.get("/health")
 async def health_check():

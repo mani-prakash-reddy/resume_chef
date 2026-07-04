@@ -21,6 +21,7 @@ dependencies = [
     "psycopg2-binary",
     "pydantic",
     "pydantic-settings",
+    "pyjwt",
     "python-dotenv",
     "sqlalchemy",
     "uvicorn[standard]",
