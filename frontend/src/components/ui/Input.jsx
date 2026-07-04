@@ -10,7 +10,7 @@ export default function Input({ label, className, ...props }) {
       )}
       <input
         className={clsx(
-          "w-full px-3 py-2 text-sm bg-surface-container-lowest border border-outline-variant rounded-xl",
+          "w-full px-3 py-2 text-sm bg-surface-container-lowest border border-outline-variant rounded-lg",
           "focus:border-primary-bright focus:outline-none transition-colors",
           className,
         )}
@@ -30,7 +30,7 @@ export function Textarea({ label, className, ...props }) {
       )}
       <textarea
         className={clsx(
-          "w-full px-3 py-2 text-sm bg-surface-container-lowest border border-outline-variant rounded-xl resize-y min-h-[80px]",
+          "w-full px-3 py-2 text-sm bg-surface-container-lowest border border-outline-variant rounded-lg resize-y min-h-[80px]",
           "focus:border-primary-bright focus:outline-none transition-colors",
           className,
         )}

@@ -50,6 +50,39 @@ body {
   background: var(--color-surface);
   color: var(--color-on-surface);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark {
+  --color-neutral-90: #000000;
+  --color-neutral-95: #0a0a0b;
+  --color-neutral-96: #030303;
+  --color-enterprise-greeting: #1b1b1b;
+  --color-custom-primary-container: #1d1d1d;
+
+  --color-surface: var(--color-neutral-96);
+  --color-surface-dim: var(--color-neutral-95);
+  --color-surface-container-lowest: var(--color-custom-primary-container);
+  --color-surface-container-low: var(--color-neutral-95);
+  --color-surface-container: var(--color-neutral-90);
+  --color-surface-container-high: var(--color-neutral-90);
+  --color-on-surface: #f5f5f5;
+  --color-on-surface-variant: #9a9a9a;
+  --color-outline: var(--color-enterprise-greeting);
+  --color-outline-variant: #1a1a1b;
+  --color-primary: #2563eb;
+  --color-primary-bright: #2563eb;
+  --color-on-primary: #ffffff;
+  --color-primary-container: var(--color-custom-primary-container);
+  --color-on-primary-container: #f2f2f2;
+  --color-secondary: var(--color-enterprise-greeting);
+  --color-secondary-container: var(--color-neutral-90);
+  --color-on-secondary-container: #f2f2f2;
+  --color-tertiary: #ffb596;
+  --color-tertiary-container: #7d2d00;
+  --color-error: #ff8a80;
+  --color-error-container: #5c1515;
+  --color-on-error-container: #ffdad6;
 }
 
 :focus-visible {
@@ -69,4 +102,54 @@ body {
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.agent-window-glass {
+  background: color-mix(in srgb, var(--color-surface-container-lowest) 68%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--color-outline-variant) 45%, transparent);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.22),
+    0 0 0 1px color-mix(in srgb, white 18%, transparent) inset,
+    0 1px 0 color-mix(in srgb, white 45%, transparent) inset;
+}
+
+.dark .agent-window-glass {
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px color-mix(in srgb, white 10%, transparent) inset,
+    0 1px 0 color-mix(in srgb, white 14%, transparent) inset;
+}
+
+.agent-panel-sidebar {
+  border-radius: 0;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  box-shadow: 0 0 0 1px color-mix(in srgb, white 18%, transparent) inset;
+}
+
+.dark .agent-panel-sidebar {
+  box-shadow: 0 0 0 1px color-mix(in srgb, white 10%, transparent) inset;
+}
+
+.chat-input-glow {
+  border: 1px solid color-mix(in srgb, var(--color-primary-bright) 30%, var(--color-outline-variant));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 12%, transparent),
+    0 0 10px color-mix(in srgb, var(--color-primary-bright) 22%, transparent);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-input-glow:focus {
+  outline: none;
+  border-color: var(--color-primary-bright);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 35%, transparent),
+    0 0 16px color-mix(in srgb, var(--color-primary-bright) 40%, transparent);
+}
+
+.chat-input-glow:focus-visible {
+  outline: none;
 }

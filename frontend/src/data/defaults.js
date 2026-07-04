@@ -1,15 +1,14 @@
 export const DEFAULT_RESUME_CODE = `% Resume Chef — LaTeX Template
 \\documentclass[11pt,a4paper]{article}
 \\usepackage[margin=0.75in]{geometry}
-\\usepackage{enumitem}
 \\usepackage{hyperref}
 
 \\begin{document}
 
 \\begin{center}
   {\\LARGE \\textbf{Alex Morgan}} \\\\
-  \\href{mailto:alex@email.com}{alex@email.com} \\;|\\;
-  (555) 123-4567 \\;|\\;
+  \\href{mailto:alex@email.com}{alex@email.com} ~|~
+  (555) 123-4567 ~|~
   \\href{https://linkedin.com/in/alexmorgan}{linkedin.com/in/alexmorgan}
 \\end{center}
 
@@ -21,7 +20,7 @@ products that users love.
 \\section*{Experience}
 \\textbf{Senior Software Engineer} \\hfill \\textit{Jan 2022 -- Present}\\\\
 \\textit{TechCorp Inc.} \\hfill Remote
-\\begin{itemize}[leftmargin=*, nosep]
+\\begin{itemize}
   \\item Led migration to microservices, reducing deploy time by 60\\%
   \\item Built real-time analytics dashboard serving 50k+ daily users
   \\item Mentored team of 4 junior engineers on React and Node.js best practices
@@ -29,7 +28,7 @@ products that users love.
 
 \\textbf{Software Engineer} \\hfill \\textit{Jun 2019 -- Dec 2021}\\\\
 \\textit{StartupXYZ} \\hfill San Francisco, CA
-\\begin{itemize}[leftmargin=*, nosep]
+\\begin{itemize}
   \\item Developed REST APIs handling 2M+ requests/day with 99.9\\% uptime
   \\item Implemented CI/CD pipeline cutting release cycles from weekly to daily
 \\end{itemize}

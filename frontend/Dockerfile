@@ -11,7 +11,7 @@ ENV NODE_ENV=development \
 
 COPY package.json package-lock.json* ./
 
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
 
 # ---------- Stage 2: builder ----------
 # Build static assets for production.

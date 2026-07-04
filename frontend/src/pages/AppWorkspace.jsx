@@ -1,30 +1,53 @@
+import { useState } from "react";
 import { ResumeProvider } from "../hooks/useResume";
 import AppHeader from "../components/layout/AppHeader";
-import TemplateSidebar from "../components/editor/TemplateSidebar";
+import AgentPanel from "../components/layout/AgentPanel";
 import CodeCanvas from "../components/editor/CodeCanvas";
-import ElementsCanvas from "../components/editor/ElementsCanvas";
 import PdfPreview from "../components/preview/PdfPreview";
-import AtsPanel from "../components/ats/AtsPanel";
-import AiChatWidget from "../components/chat/AiChatWidget";
+import ResizableSplitPane from "../components/layout/ResizableSplitPane";
+import MyResumesView from "./MyResumesView";
+import TemplatesView from "./TemplatesView";
+import SettingsView from "./SettingsView";
 
 export default function AppWorkspace() {
+  const [activeView, setActiveView] = useState("canvas");
+  const [activeAgent, setActiveAgent] = useState("resume");
+
   return (
     <ResumeProvider>
       <div className="h-full flex flex-col overflow-hidden">
-        <AppHeader />
-        <div className="flex-1 flex min-h-0">
-          <TemplateSidebar />
+        <AppHeader activeView={activeView} onViewChange={setActiveView} />
+
+        {activeView === "canvas" && (
           <main className="flex-1 flex min-w-0 min-h-0">
-            <section className="flex-1 min-w-0 border-r border-outline-variant bg-surface-container-lowest">
-              <CodeCanvas elementsPanel={<ElementsCanvas />} />
-            </section>
-            <section className="w-[45%] min-w-[320px] max-w-[560px] shrink-0">
-              <PdfPreview />
-            </section>
+            <ResizableSplitPane
+              left={
+                <ResizableSplitPane
+                  left={<CodeCanvas />}
+                  right={<PdfPreview />}
+                  defaultRatio={0.5}
+                  minLeft={280}
+                  minRight={280}
+                  storageKey="resume-chef-canvas-split-ratio"
+                />
+              }
+              right={
+                <AgentPanel
+                  activeAgent={activeAgent}
+                  onAgentChange={setActiveAgent}
+                />
+              }
+              defaultRatio={0.68}
+              minLeft={560}
+              minRight={300}
+              storageKey="resume-chef-agent-split-ratio"
+            />
           </main>
-          <AtsPanel />
-        </div>
-        <AiChatWidget />
+        )}
+
+        {activeView === "resumes" && <MyResumesView />}
+        {activeView === "templates" && <TemplatesView />}
+        {activeView === "settings" && <SettingsView />}
       </div>
     </ResumeProvider>
   );

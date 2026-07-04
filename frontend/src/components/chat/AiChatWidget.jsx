@@ -1,22 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Minimize2,
-  Maximize2,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { Send, Wand2 } from "lucide-react";
 import clsx from "clsx";
 import { useResume } from "../../hooks/useResume";
 import { chatWithAi } from "../../lib/api";
 import Button from "../ui/Button";
+import Strands from "../effects/Strands";
 
 export default function AiChatWidget() {
   const { code, elements, updateSummary } = useResume();
-  const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
@@ -28,10 +19,18 @@ export default function AiChatWidget() {
   ]);
   const [suggestions, setSuggestions] = useState([]);
   const bottomRef = useRef(null);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, open]);
+  }, [messages]);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  }, [input]);
 
   async function sendMessage(text) {
     if (!text.trim() || loading) return;
@@ -80,69 +79,45 @@ export default function AiChatWidget() {
     ]);
   }
 
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary-bright text-on-primary shadow-lg hover:shadow-xl transition-shadow flex items-center justify-center cursor-pointer"
-        aria-label="Open AI chat"
-      >
-        <MessageCircle className="w-6 h-6" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-tertiary-container rounded-full border-2 border-surface-container-lowest" />
-      </button>
-    );
-  }
-
   return (
-    <div
-      className={clsx(
-        "fixed z-50 flex flex-col bg-surface-container-lowest border border-outline-variant shadow-2xl rounded-2xl overflow-hidden transition-all",
-        expanded
-          ? "inset-4 md:inset-8"
-          : "bottom-6 right-6 w-[380px] h-[520px] max-h-[calc(100vh-48px)]",
-      )}
-    >
-      <header className="flex items-center justify-between px-4 py-3 border-b border-outline-variant bg-surface-container-low shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary-bright flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-on-primary" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-on-surface">
-              AI Resume Assistant
-            </div>
-            <div className="text-xs text-on-surface-variant">
-              Chat & apply updates
-            </div>
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="relative flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
+          aria-hidden
+        >
+          <div className="w-full max-w-sm h-48 opacity-40">
+            <Strands
+              colors={["#2563EB", "#7C3AED", "#06B6D4"]}
+              count={3}
+              speed={0.5}
+              amplitude={1}
+              waviness={1}
+              thickness={0.7}
+              glow={2.6}
+              taper={3}
+              spread={1}
+              intensity={0.6}
+              saturation={1.5}
+              opacity={1}
+              scale={1.5}
+              glass={false}
+              refraction={1}
+              dispersion={1}
+              glassSize={1}
+            />
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <IconButton
-            onClick={() => setExpanded((e) => !e)}
-            label={expanded ? "Minimize" : "Expand"}
-          >
-            {expanded ? (
-              <Minimize2 className="w-4 h-4" />
-            ) : (
-              <Maximize2 className="w-4 h-4" />
-            )}
-          </IconButton>
-          <IconButton onClick={() => setOpen(false)} label="Close">
-            <X className="w-4 h-4" />
-          </IconButton>
-        </div>
-      </header>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+        <div className="relative z-10 space-y-3">
         {messages.map((msg, i) => (
           <div
             key={i}
             className={clsx(
-              "max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed",
+              "max-w-[85%] px-3 py-2 rounded-lg text-sm leading-relaxed",
               msg.role === "user"
-                ? "ml-auto bg-primary-bright text-on-primary rounded-br-md"
-                : "bg-surface-container text-on-surface rounded-bl-md",
+                ? "ml-auto bg-primary-bright text-on-primary"
+                : "bg-surface-container text-on-surface",
             )}
           >
             {msg.content}
@@ -154,10 +129,11 @@ export default function AiChatWidget() {
           </div>
         )}
         <div ref={bottomRef} />
+        </div>
       </div>
 
       {suggestions.length > 0 && (
-        <div className="px-4 py-2 border-t border-outline-variant bg-surface-container-low shrink-0">
+        <div className="px-4 py-2 border-t border-outline-variant/40 shrink-0">
           <div className="text-xs font-semibold text-on-surface-variant mb-2 flex items-center gap-1">
             <Wand2 className="w-3 h-3" />
             Quick suggestions
@@ -168,7 +144,7 @@ export default function AiChatWidget() {
                 key={i}
                 type="button"
                 onClick={() => applySuggestion(s)}
-                className="text-xs px-2.5 py-1 rounded-full bg-secondary-container text-primary hover:opacity-80 cursor-pointer"
+                className="text-xs px-2.5 py-1 rounded-lg bg-secondary-container text-primary hover:opacity-80 cursor-pointer"
               >
                 {s.length > 40 ? s.slice(0, 40) + "…" : s}
               </button>
@@ -178,35 +154,35 @@ export default function AiChatWidget() {
       )}
 
       <form
-        className="flex gap-2 p-3 border-t border-outline-variant shrink-0"
+        className="flex gap-2 items-end p-3 pb-8 border-t border-outline-variant/40 border-b shrink-0"
         onSubmit={(e) => {
           e.preventDefault();
           sendMessage(input);
         }}
       >
-        <input
+        <textarea
+          ref={textareaRef}
           value={input}
+          rows={1}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage(input);
+            }
+          }}
           placeholder="Ask about your resume…"
-          className="flex-1 px-3 py-2 text-sm bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-primary-bright focus:outline-none"
+          className="chat-input-glow flex-1 px-3 py-2 text-sm bg-surface-container-lowest/80 rounded-lg resize-none overflow-y-auto leading-relaxed"
         />
-        <Button type="submit" size="sm" disabled={loading || !input.trim()}>
+        <Button
+          type="submit"
+          size="sm"
+          disabled={loading || !input.trim()}
+          className="shrink-0"
+        >
           <Send className="w-4 h-4" />
         </Button>
       </form>
     </div>
-  );
-}
-
-function IconButton({ children, onClick, label }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface cursor-pointer"
-    >
-      {children}
-    </button>
   );
 }
