@@ -139,11 +139,49 @@ class AgentFactory:
     @staticmethod
     def create_agent(agent_type: str) -> BaseAgent:
         if agent_type == 'chat':
-            return ChatAgent()
-        elif agent_type == 'ats_scorer':
-            return AtsScoringAgent()
-        raise ValueError("Unknown agent type")
+            # Streaming LangGraph agent with FastMCP read_resume/patch_resume tools
+            return ChatResumeAgent()
+        elif agent_type == 'ats':
+            # One-shot structured-output agent, no tool calls
+            return AtsAgent()
+        raise ValueError(f"Unknown agent type: {agent_type}")
 ```
+
+#### 6. FastMCP Tool Design — Runtime Injection Pattern
+The Chat Agent's tools (`read_resume`, `patch_resume`) never expose `resume_id` as an agent-fillable parameter. The backend injects it at request time from the authenticated user's session, binding the tool instance to the correct resume before handing it to the agent:
+
+```python
+# mcp_tools.py
+from fastmcp import tool
+
+@tool
+async def read_resume(
+    starting_line: int | None = None,
+    no_of_lines: int | None = None,
+    # resume_id is NOT in the tool signature — injected by the caller
+    _resume_id: str = "",  # populated at runtime
+) -> str:
+    """
+    Returns resume content with 1-indexed line numbers.
+    If no params given, returns the full file.
+    Partial reads include a footer: [Lines X to Y of N total lines].
+    """
+    ...
+
+@tool
+async def patch_resume(
+    patches: list[dict],  # [{"from": int, "to": int, "content": str}]
+    _resume_id: str = "",  # populated at runtime
+) -> dict:
+    """
+    Applies ordered patches. Line numbers always refer to the original file.
+    Best-effort: succeeded patches are committed, failed ones are reported back.
+    Agent must not send overlapping ranges.
+    """
+    ...
+```
+
+See [docs/AGENTS_DESIGN.md](AGENTS_DESIGN.md) for the full tool contract and patch semantics.
 
 ---
 

@@ -18,6 +18,23 @@ Status: Draft / brainstorm — pricing numbers and quotas are starting points to
   - Rewarded ads at the quota wall: "watch a short ad → get 1 more message/check today," shown only when a free user actually hits their limit.
 - No MCP access, no job tracker, no auto-apply — these are Pro/future-only.
 
+## Free-tier ATS Paywall (Quota Wall Behaviour)
+
+When a free user exhausts their ATS check allowance, the ATS results panel enters a **blur gate** state. The score is always shown — it is the primary conversion hook ("Your score is 42/100 🔴" is a strong upgrade trigger). Everything else is obscured:
+
+| ATS Component | Within free quota | Quota exhausted | Pro |
+|---|---|---|---|
+| Score (0–100) | ✅ Visible | ✅ Always visible | ✅ Visible |
+| Matched keywords | ✅ Visible | 🔒 Blurred | ✅ Visible |
+| Missing keywords | ✅ Visible | 🔒 Blurred | ✅ Visible |
+| AI Suggestions | ✅ Visible | 🔒 Blurred | ✅ Visible |
+| Summary text | ✅ Visible | 🔒 Blurred | ✅ Visible |
+| "Improve Resume" button | ✅ Visible | 🔒 Hidden + upgrade CTA | ✅ Visible |
+
+**Dummy content behind the blur:** Use realistic-looking placeholder text (e.g. skill names, plausible suggestion sentences) — not lorem ipsum. The content should look credible and tantalizing so the blur gate motivates upgrades rather than looking obviously fake.
+
+**Upgrade CTA placement:** A "Go Pro" button / card overlaid on the blurred region, not a separate page. Keeps the user in context (they can see the score) and reduces friction to subscribing.
+
 ## Pro tier — subscription + wallet, unified into one balance
 
 Pro is a **recurring subscription** (not a pure pay-as-you-go wallet), but AI usage is metered through a **credits wallet** layered on top. Two concepts, cleanly split:
@@ -75,7 +92,7 @@ free_tier_usage        (user_id, period_key, chat_messages_used, ats_checks_used
 ```
 
 - `credit_transactions` is an append-only ledger — gives an audit trail and a base for tuning credit costs from real usage/cost data later.
-- Worth logging actual raw LLM token counts in transaction `metadata` even though the user-facing unit is credits, to sanity-check margins before scaling.
+- Worth logging actual raw LLM token counts in transaction `metadata` — split into `prompt_tokens` and `completion_tokens` (not just total) since completion tokens cost more, and this split enables prompt optimization and margin analysis. Also log `model` and `agent` (`chat_agent` / `ats_agent`) for per-action cost attribution. See [docs/AGENTS_DESIGN.md](AGENTS_DESIGN.md) for the full metadata schema.
 - `chatWithAi` and `analyzeAts` (used by `AiChatWidget.jsx` and `AtsPanel.jsx`) need a pre-check dependency: free users check/increment `free_tier_usage`; Pro users check/debit `wallets` via a `credit_transactions` insert.
 - Frontend needs quota/paywall states: disable input + show an upgrade CTA when a quota-exceeded response comes back, and a resume-count gate + upgrade prompt in `MyResumesView.jsx`.
 

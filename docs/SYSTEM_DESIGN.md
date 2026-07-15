@@ -32,6 +32,7 @@ All new tables live in `backend/database/models.py`. `user_id` columns are `UUID
 - `pricing_tiers`: id, country_code, currency, monthly_price_minor, annual_price_minor, monthly_credits (amounts stored in minor units — paise/cents — to avoid float rounding)
 - `wallets`: user_id (PK), balance, updated_at
 - `credit_transactions`: id, user_id, delta, balance_after, action_type (`subscription_grant`/`topup`/`chat_message`/`ats_check`/`mcp_call`), reference_id, metadata (JSON), created_at — append-only ledger, indexed on `(user_id, created_at)`
+  - `metadata` must always include AI usage: `{ "model": "gpt-4o-mini", "agent": "chat_agent"|"ats_agent", "prompt_tokens": N, "completion_tokens": N, "total_tokens": N }`. Prompt and completion tokens are logged separately since completion tokens cost more — this split enables prompt optimization and margin analysis before scaling.
 - `free_tier_usage`: (user_id, period_key) composite PK, chat_messages_used, ats_checks_used — `period_key` is a date/month string so resets are just a new row
 - `payment_orders`: id, user_id, provider, provider_order_id (unique), amount_minor, currency, credits_granted, status (`created`/`paid`/`failed`), created_at — makes the Razorpay webhook idempotent
 - `mcp_tokens`: id, user_id, token_hash, name, last_used_at, revoked_at — long-lived tokens for external agents, since Supabase JWTs aren't practical for third-party MCP clients
@@ -57,10 +58,11 @@ To support multiple workflows for creating a resume, the system must handle both
 ## Backend module layout (mirrors the existing `auth/` package pattern)
 
 - `backend/resumes/` — `router.py` (CRUD), `schemas.py`, `service.py`
-- `backend/ai/` — `router.py` (`POST /ai/chat`, `POST /ai/ats`), `agents.py` (LangGraph/deepagents definitions for the Resume Agent and ATS Agent)
-- `backend/credits/` — `service.py` with `get_balance`, `check_and_reserve(user_id, action_type)`, `settle(user_id, action_type, cost)`; this is the one place quota/credit logic lives
+- `backend/ai/` — `router.py` (`POST /ai/chat` with SSE streaming, `POST /ai/ats`), `agents/chat_agent.py` (LangGraph chat agent with FastMCP tool bindings), `agents/ats_agent.py` (LangGraph structured-output agent). Full agent design in [docs/AGENTS_DESIGN.md](AGENTS_DESIGN.md).
+- `backend/ai/mcp_tools.py` — FastMCP tool definitions: `read_resume` (line-range read with optional params, full-file default) and `patch_resume` (ordered list of `{from, to, content}` patches, best-effort, line numbers always reference original file). `resume_id` is runtime-injected; the agent never fills it.
+- `backend/credits/` — `service.py` with `get_balance`, `check_and_reserve(user_id, action_type)`, `settle(user_id, action_type, cost, token_metadata)`; this is the one place quota/credit logic lives
 - `backend/billing/` — `router.py` (`POST /billing/checkout`, `POST /billing/webhook/razorpay`), `providers/razorpay.py` implementing a small `PaymentProvider` protocol (`create_order`, `verify_webhook`, `parse_event`) so Stripe/Paddle can be dropped in later without touching the router
-- `backend/mcp/` — MCP server mounted at `/mcp`, tools for `list_resumes`/`get_resume`/`update_resume_section`/`run_ats_check`, token auth in `mcp/auth.py`
+- `backend/mcp/` — MCP server mounted at `/mcp`, reserved for future Pro external-client access (Claude Desktop, Cursor). Not in scope for v1.
 
 ## Quota/credit enforcement flow
 
@@ -139,8 +141,9 @@ sequenceDiagram
 
 ## Suggested build phases
 
-1. Resume persistence + real AI chat/ATS endpoints (LangGraph agents), no monetization gating yet — unblocks everything else and fixes the current mock-only state.
-2. `wallets` / `credit_transactions` / `subscriptions` / `free_tier_usage` tables + the `credits.service` quota dependency wired onto the Phase 1 endpoints.
-3. Razorpay checkout + webhook + `pricing_tiers`, end-to-end Pro upgrade flow.
-4. MCP server + token management UI.
-5. Ads (static banner, then rewarded-ad-for-credit).
+1. **Resume persistence + AI agents** (no monetization gating yet) — implement `read_resume` / `patch_resume` FastMCP tools, Chat Agent (streaming), ATS Agent (JSON output, spinner UX). Fixes the current mock-only state and unblocks everything else. See [docs/AGENTS_DESIGN.md](AGENTS_DESIGN.md) for full agent design.
+2. **Quota/credit layer** — `wallets` / `credit_transactions` / `subscriptions` / `free_tier_usage` tables + `credits.service` wired onto the Phase 1 endpoints. ATS blur gate for free users at quota limit.
+3. **Razorpay checkout** — `pricing_tiers`, end-to-end Pro upgrade flow, webhook idempotency.
+4. **Ads** — static banner (frontend only), then rewarded-ad-for-credit (`POST /free-usage/reward` server-side callback).
+5. **ATS keyword extraction pass** — spaCy/NLTK pre-pass before the LLM call for higher accuracy. Deferred until core agents are stable.
+6. **MCP external client access** — Pro-only, external tools (Claude Desktop, Cursor). Full `backend/mcp/` implementation with token management UI.
