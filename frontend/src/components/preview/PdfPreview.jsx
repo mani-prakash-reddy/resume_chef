@@ -63,7 +63,7 @@ export default function PdfPreview() {
         <div className="flex items-center gap-2 min-w-0">
           <FileText className="w-4 h-4 text-primary shrink-0" />
           <span className="text-sm font-semibold text-on-surface shrink-0">
-            PDF Preview
+            Resume Preview
           </span>
         </div>
 

@@ -27,7 +27,7 @@ Everything stays inside the existing FastAPI app (MCP included) — new routers 
 
 All new tables live in `backend/database/models.py`. `user_id` columns are `UUID` foreign keys to `auth.users(id)` (no mirror table needed since it's the same Postgres instance).
 
-- `resumes`: id, user_id, title, latex_code, elements (JSON), template_id, job_description, is_archived, created_at, updated_at
+- `resumes`: id, user_id, title, builder_type (`latex`, `html`, `wysiwyg`), content_code (text, for code-based), content_elements (JSON, for drag-and-drop/wysiwyg), template_id, job_description, is_archived, created_at, updated_at
 - `subscriptions`: user_id (PK), plan (`free`/`monthly`/`annual`), status, current_period_end, provider, provider_subscription_id, country_code
 - `pricing_tiers`: id, country_code, currency, monthly_price_minor, annual_price_minor, monthly_credits (amounts stored in minor units — paise/cents — to avoid float rounding)
 - `wallets`: user_id (PK), balance, updated_at
@@ -35,6 +35,24 @@ All new tables live in `backend/database/models.py`. `user_id` columns are `UUID
 - `free_tier_usage`: (user_id, period_key) composite PK, chat_messages_used, ats_checks_used — `period_key` is a date/month string so resets are just a new row
 - `payment_orders`: id, user_id, provider, provider_order_id (unique), amount_minor, currency, credits_granted, status (`created`/`paid`/`failed`), created_at — makes the Razorpay webhook idempotent
 - `mcp_tokens`: id, user_id, token_hash, name, last_used_at, revoked_at — long-lived tokens for external agents, since Supabase JWTs aren't practical for third-party MCP clients
+
+## Resume Builder Architectures
+
+To support multiple workflows for creating a resume, the system must handle both code-based and visual builder paradigms. The `builder_type` in the `resumes` table dictates the UI mode and how data is parsed.
+
+### Code-Based Builders (LaTeX & HTML)
+- **Frontend**: A split-pane view with a code editor (e.g., Monaco Editor) on the left and a live preview on the right.
+- **State**: The resume content is stored as raw text in the `content_code` column.
+- **LaTeX Compilation**: Live preview and final PDF generation are powered completely on the frontend using a WebAssembly LaTeX compiler (e.g., SwiftLaTeX/Tectonic).
+- **HTML/CSS Mode**: Uses standard frontend rendering in a sandboxed `<iframe>` for real-time previewing.
+- **Auto-Sync**: The frontend auto-syncs code changes to the backend every *X* seconds (configurable via settings and env) to ensure data durability without disrupting the editing experience.
+
+### WYSIWYG / Drag & Drop Builder
+- **Frontend**: A visual canvas utilizing a drag-and-drop library (e.g., `@dnd-kit/core`). Users drag predefined components (Text Block, Two-Column Layout, Experience Section) onto the page.
+- **Inline Editing**: Text fields utilize `contentEditable` elements, allowing users to type and format directly onto the canvas.
+- **State**: The resume structure is a JSON tree representing the layout, components, and textual data, stored in the `content_elements` column.
+- **Export**: To generate PDFs from the visual builder, the system relies exclusively on frontend DOM-to-PDF libraries (like `html2pdf.js`, `react-pdf`, or `window.print()`).
+- **Auto-Sync**: The canvas JSON state (`content_elements`) is automatically synced to the backend every *X* seconds, exactly like the code-based builder.
 
 ## Backend module layout (mirrors the existing `auth/` package pattern)
 
@@ -103,8 +121,8 @@ sequenceDiagram
 
 ## MCP server
 
-- Mounted at `/mcp` in the same FastAPI app; tools operate on the same `resumes`/`credits` services as the REST routes, so behavior stays consistent between the web app and external agents.
-- Auth via `mcp_tokens` (opaque token, hashed at rest, generated from a new "Developer / MCP" section in `SettingsView.jsx`), not the Supabase JWT.
+- Mounted at `/mcp` in the same FastAPI app; exposes different tools by path for different resume formats (e.g., `/mcp/latex`, `/mcp/wysiwyg`). Tools operate on the same `resumes`/`credits` services as the REST routes.
+- **Auth**: Uses the standard auth middleware and the same Supabase JWT token to validate the request and extract the user ID, ensuring unified authentication for both the React SPA and MCP clients.
 - MCP calls are a free Pro perk (rate-limited, not credit-metered) as long as they only read/write resume data. If a future MCP tool triggers an LLM call, route it through the same `credits.service` as `/ai/chat`.
 
 ## Frontend changes required
