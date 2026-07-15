@@ -27,7 +27,7 @@ const features = [
 export default function LandingPage() {
   const appUrl =
     typeof window !== "undefined"
-      ? `${window.location.protocol}//app.${window.location.host}${window.location.port ? `:${window.location.port}` : ""}`
+      ? `${window.location.protocol}//app.${window.location.hostname}${window.location.port ? `:${window.location.port}` : ""}`
       : "http://app.localhost:5173";
 
   return (

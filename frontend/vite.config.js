@@ -26,6 +26,11 @@ export default defineConfig({
         target: "https://texlive.texlyre.org",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/texlive-proxy/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyRes", (proxyRes) => {
+            proxyRes.headers["Cache-Control"] = "public, max-age=31536000, immutable";
+          });
+        },
       },
     },
   },
