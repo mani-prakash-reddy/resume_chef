@@ -8,10 +8,12 @@ services:
             - "8000:8000"
         working_dir: /app
         restart: unless-stopped
-        networks:
-            - resume_chef_network
+        network_mode: "host"
         extra_hosts:
             - "host.docker.internal:host-gateway"
+        dns:
+            - 8.8.8.8
+            - 1.1.1.1
         healthcheck:
             test:
                 [
@@ -44,13 +46,15 @@ services:
         env_file:
             - .env
         environment:
-            - VITE_API_PROXY=http://backend:8000
+            - VITE_API_PROXY=http://host.docker.internal:8000
         ports:
             - "5173:5173"
         working_dir: /app
         restart: unless-stopped
         networks:
             - resume_chef_network
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         develop:
             watch:
                 - action: rebuild

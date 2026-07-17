@@ -45,7 +45,7 @@ export default function AppWorkspace() {
           </main>
         )}
 
-        {activeView === "resumes" && <MyResumesView />}
+        {activeView === "resumes" && <MyResumesView onOpenCanvas={() => setActiveView("canvas")} />}
         {activeView === "templates" && <TemplatesView />}
         {activeView === "settings" && <SettingsView />}
       </div>

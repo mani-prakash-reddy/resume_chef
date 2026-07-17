@@ -16,6 +16,7 @@ engine = create_async_engine(
     pool_size=10,
     max_overflow=20,
     pool_pre_ping=True,
+    connect_args={'ssl': 'require'}
 )
 
 # Create async session factory
@@ -29,17 +30,15 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def init_db():
-    """Initialize database tables and pgvector extension"""
+    """Initialize database tables."""
     async with engine.begin() as conn:
-        # Enable pgvector extension
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        # Create all tables
+        # Create all tables defined in models.py
         await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database initialized successfully with pgvector extension")
+    logger.info("Database initialized successfully")
 
 
-async def get_db() -> AsyncSession:
-    """Get database session"""
+async def get_db():
+    """FastAPI dependency: yields an async SQLAlchemy session."""
     async with AsyncSessionLocal() as session:
         try:
             yield session

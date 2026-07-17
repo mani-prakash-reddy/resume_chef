@@ -16,18 +16,34 @@ class AuthUser(BaseModel):
     role: Optional[str] = None
 
 
-def _decode_supabase_token(token: str) -> dict:
-    if not settings.supabase_jwt_secret:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Supabase JWT secret is not configured",
-        )
+jwks_url = f"{settings.supabase_url}/auth/v1/.well-known/jwks.json" if settings.supabase_url else ""
+jwks_client = jwt.PyJWKClient(jwks_url) if jwks_url else None
 
+def _decode_supabase_token(token: str) -> dict:
     try:
+        if jwks_client:
+            try:
+                signing_key = jwks_client.get_signing_key_from_jwt(token)
+                return jwt.decode(
+                    token,
+                    signing_key.key,
+                    algorithms=["HS256", "RS256", "ES256"],
+                    audience="authenticated",
+                )
+            except jwt.PyJWKClientError:
+                pass  # Fallback to symmetric key
+        
+        # Fallback to symmetric secret for legacy tokens
+        if not settings.supabase_jwt_secret:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Supabase JWT secret is not configured and JWKS failed",
+            )
+        
         return jwt.decode(
             token,
             settings.supabase_jwt_secret,
-            algorithms=["HS256"],
+            algorithms=["HS256", "RS256", "ES256"],
             audience="authenticated",
         )
     except jwt.ExpiredSignatureError:

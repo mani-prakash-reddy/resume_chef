@@ -1,3 +1,4 @@
+import { useState } from "react";
 import clsx from "clsx";
 import { Sparkles, Target } from "lucide-react";
 import AiChatWidget from "../chat/AiChatWidget";
@@ -9,6 +10,19 @@ const agents = [
 ];
 
 export default function AgentPanel({ activeAgent, onAgentChange }) {
+  // ATS context injected into the chat agent when "Improve Resume" is clicked.
+  // This is the hidden system message that primes the chat agent with the ATS results.
+  const [atsContext, setAtsContext] = useState(null);
+
+  function handleImproveResume(context) {
+    setAtsContext(context);
+    onAgentChange("resume"); // Switch to the Resume Agent tab
+  }
+
+  function handleClearAtsContext() {
+    setAtsContext(null);
+  }
+
   return (
     <aside className="agent-window-glass agent-panel-sidebar flex flex-col flex-1 min-h-0 min-w-0">
       <div
@@ -25,6 +39,7 @@ export default function AgentPanel({ activeAgent, onAgentChange }) {
               role="tab"
               aria-selected={active}
               onClick={() => onAgentChange(id)}
+              id={`agent-tab-${id}`}
               className={clsx(
                 "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
                 active
@@ -40,8 +55,15 @@ export default function AgentPanel({ activeAgent, onAgentChange }) {
       </div>
 
       <div className="flex-1 min-h-0 flex flex-col">
-        {activeAgent === "resume" && <AiChatWidget />}
-        {activeAgent === "ats" && <AtsPanel />}
+        {activeAgent === "resume" && (
+          <AiChatWidget
+            atsContext={atsContext}
+            onClearAtsContext={handleClearAtsContext}
+          />
+        )}
+        {activeAgent === "ats" && (
+          <AtsPanel onImproveResume={handleImproveResume} />
+        )}
       </div>
     </aside>
   );

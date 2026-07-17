@@ -4,8 +4,8 @@ Includes business rules derived from client Q&A requirements.
 """
 
 from pydantic_settings import BaseSettings
-from pydantic import BaseModel
-from typing import Optional, Dict, List
+from typing import Optional
+
 
 # =========================================================
 # Application Settings
@@ -32,6 +32,27 @@ class Settings(BaseSettings):
     # Supabase Auth (JWT verification for API requests)
     supabase_url: str = ""
     supabase_jwt_secret: str = ""
+
+    # OpenRouter LLM provider
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+
+    # Default model slugs (OpenRouter model strings)
+    default_chat_model: str = "tencent/hy3:free"
+    default_ats_model: str = "tencent/hy3:free"
+
+    # Free tier daily quotas (resets per calendar day UTC)
+    free_tier_daily_chat_limit: int = 5
+    free_tier_daily_ats_limit: int = 1
+
+    # Credit costs per action (for Pro wallet deductions)
+    credit_cost_chat_message: int = 1
+    credit_cost_ats_check: int = 2
+
+    # Razorpay (Phase 3)
+    razorpay_key_id: Optional[str] = None
+    razorpay_key_secret: Optional[str] = None
+    razorpay_webhook_secret: Optional[str] = None
 
     class Config:
         env_file = ".env"

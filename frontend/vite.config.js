@@ -5,6 +5,11 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    allowedHosts: [
+      "localhost",
+      "vivobook.local",
+      ".vivobook.local"
+    ],
     host: true,
     port: 5173,
     watch: {
