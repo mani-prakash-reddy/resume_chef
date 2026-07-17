@@ -8,6 +8,8 @@ export default function ResizableSplitPane({
   minLeft = 280,
   minRight = 280,
   storageKey = "resume-chef-canvas-split-ratio",
+  isLeftCollapsed = false,
+  collapsedLeftWidth = 48,
 }) {
   const containerRef = useRef(null);
   const dragging = useRef(false);
@@ -77,25 +79,27 @@ export default function ResizableSplitPane({
       className="flex flex-1 min-w-0 min-h-0"
     >
       <div
-        className="min-w-0 min-h-0 flex flex-col shrink-0 bg-surface-container-lowest"
-        style={{ width: `${ratio * 100}%` }}
+        className="min-w-0 min-h-0 flex flex-col shrink-0 bg-surface-container-lowest transition-[width] duration-200"
+        style={{ width: isLeftCollapsed ? `${collapsedLeftWidth}px` : `${ratio * 100}%` }}
       >
         {left}
       </div>
 
-      <div
-        role="separator"
-        aria-orientation="vertical"
-        aria-label="Resize editor and preview"
-        aria-valuenow={Math.round(ratio * 100)}
-        onPointerDown={onDividerPointerDown}
-        className={clsx(
-          "relative w-1 shrink-0 cursor-col-resize bg-outline-variant/50",
-          "hover:bg-primary-bright/60 active:bg-primary-bright transition-colors",
-        )}
-      >
-        <div className="absolute inset-y-0 -left-1.5 -right-1.5" />
-      </div>
+      {!isLeftCollapsed && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize editor and preview"
+          aria-valuenow={Math.round(ratio * 100)}
+          onPointerDown={onDividerPointerDown}
+          className={clsx(
+            "relative w-1 shrink-0 cursor-col-resize bg-outline-variant/50",
+            "hover:bg-primary-bright/60 active:bg-primary-bright transition-colors",
+          )}
+        >
+          <div className="absolute inset-y-0 -left-1.5 -right-1.5" />
+        </div>
+      )}
 
       <div className="flex-1 min-w-0 min-h-0 flex flex-col">
         {right}

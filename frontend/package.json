@@ -9,13 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@llm-ui/code": "^0.13.3",
+    "@llm-ui/markdown": "^0.13.3",
+    "@llm-ui/react": "^0.13.3",
     "@monaco-editor/react": "^4.7.0",
     "@supabase/supabase-js": "^2.110.0",
     "clsx": "^2.1.1",
+    "html-react-parser": "^6.1.5",
     "lucide-react": "^0.511.0",
+    "monaco-editor": "^0.55.1",
     "ogl": "^1.0.11",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^1.29.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.8",

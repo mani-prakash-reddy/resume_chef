@@ -14,6 +14,7 @@ BuilderType = Literal["latex", "html", "wysiwyg"]
 
 class ResumeCreate(BaseModel):
     title: str = Field(default="Untitled Resume", max_length=255)
+    file_name: Optional[str] = None
     builder_type: BuilderType = "latex"
     content_code: Optional[str] = None
     content_elements: Optional[Any] = None
@@ -25,6 +26,7 @@ class ResumeUpdate(BaseModel):
     """Partial update — all fields optional (used by auto-sync PATCH)."""
 
     title: Optional[str] = Field(default=None, max_length=255)
+    file_name: Optional[str] = None
     content_code: Optional[str] = None
     content_elements: Optional[Any] = None
     job_description: Optional[str] = None
@@ -35,6 +37,7 @@ class ResumeResponse(BaseModel):
     id: UUID
     user_id: UUID
     title: str
+    file_name: Optional[str] = None
     builder_type: BuilderType
     content_code: Optional[str] = None
     content_elements: Optional[Any] = None

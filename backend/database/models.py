@@ -49,6 +49,7 @@ class Resume(Base):
         index=True,
     )
     title = Column(String(255), nullable=False, default="Untitled Resume")
+    file_name = Column(String(255), nullable=True)
     builder_type = Column(
         Enum("latex", "html", "wysiwyg", name="builder_type_enum"),
         nullable=False,

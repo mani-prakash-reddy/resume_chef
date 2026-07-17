@@ -57,6 +57,7 @@ class ResumeService:
         resume = Resume(
             user_id=user_id,
             title=data.title,
+            file_name=data.file_name,
             builder_type=data.builder_type,
             content_code=data.content_code,
             content_elements=data.content_elements,

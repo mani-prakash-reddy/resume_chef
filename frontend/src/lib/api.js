@@ -28,6 +28,11 @@ async function request(path, options = {}) {
     error.detail = err.detail;
     throw error;
   }
+  
+  if (res.status === 204) {
+    return null;
+  }
+  
   return res.json();
 }
 
@@ -74,7 +79,7 @@ export async function saveResume(id, patch) {
   });
 }
 
-export async function archiveResume(id) {
+export async function deleteResume(id) {
   return request(`/resumes/${id}`, { method: "DELETE" });
 }
 

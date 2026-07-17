@@ -25,6 +25,8 @@ export function ResumeProvider({ children }) {
 
   // Persistence state
   const [resumeId, setResumeId] = useState(null);       // UUID of the resume in DB (null = not yet saved)
+  const [resumeTitle, setResumeTitle] = useState("Untitled Resume");
+  const [resumeFileName, setResumeFileName] = useState("");
   const [builderType, setBuilderType] = useState("latex");
   const [syncStatus, setSyncStatus] = useState("idle"); // "idle" | "saving" | "saved" | "error"
 
@@ -157,6 +159,8 @@ export function ResumeProvider({ children }) {
    */
   const loadResume = useCallback((resume) => {
     setResumeId(resume.id);
+    setResumeTitle(resume.title || "Untitled Resume");
+    setResumeFileName(resume.file_name || "");
     setBuilderType(resume.builder_type);
     if (resume.builder_type === "wysiwyg") {
       setElements(resume.content_elements || DEFAULT_ELEMENTS);
@@ -164,6 +168,18 @@ export function ResumeProvider({ children }) {
       setCode(resume.content_code || DEFAULT_RESUME_CODE);
     }
     if (resume.job_description) setJobDescription(resume.job_description);
+    dirtyRef.current = false;
+    setSyncStatus("idle");
+  }, []);
+
+  const clearResume = useCallback(() => {
+    setResumeId(null);
+    setResumeTitle("Untitled Resume");
+    setResumeFileName("");
+    setCode(DEFAULT_RESUME_CODE);
+    setElements(DEFAULT_ELEMENTS);
+    setJobDescription("");
+    setPreviewHtml(null);
     dirtyRef.current = false;
     setSyncStatus("idle");
   }, []);
@@ -186,10 +202,15 @@ export function ResumeProvider({ children }) {
     // Persistence
     resumeId,
     setResumeId,
+    resumeTitle,
+    setResumeTitle,
+    resumeFileName,
+    setResumeFileName,
     builderType,
     setBuilderType,
     syncStatus,
     loadResume,
+    clearResume,
     // WYSIWYG field helpers
     updateContact,
     updateSummary,

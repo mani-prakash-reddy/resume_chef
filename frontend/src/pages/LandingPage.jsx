@@ -1,135 +1,105 @@
-import { ChefHat, ArrowRight } from "lucide-react";
+import { LayoutTemplate, Code2, MousePointerClick, Sparkles, FileText } from "lucide-react";
 import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 
-const features = [
-  {
-    title: "Code & Elements Editor",
-    description:
-      "Switch between LaTeX code view and a visual elements canvas. Edit contact, experience, skills, and more.",
-  },
-  {
-    title: "Live PDF Preview",
-    description:
-      "See your resume render in real time as you edit. Export polished PDFs ready to send.",
-  },
-  {
-    title: "AI Resume Assistant",
-    description:
-      "Chat with AI to refine bullets, tailor content for job postings, and apply suggestions instantly.",
-  },
-  {
-    title: "ATS Score Analyzer",
-    description:
-      "Get an ATS compatibility score, keyword gaps, and actionable tips to pass automated screening.",
-  },
-];
-
-export default function LandingPage() {
-  const appUrl =
-    typeof window !== "undefined"
-      ? `${window.location.protocol}//app.${window.location.hostname}${window.location.port ? `:${window.location.port}` : ""}`
-      : "http://app.localhost:5173";
-
+export default function LandingPage({ onNavigateToResumes }) {
   return (
-    <div className="min-h-full flex flex-col">
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-surface/80 border-b border-outline-variant">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-primary-bright flex items-center justify-center">
-              <ChefHat className="w-5 h-5 text-on-primary" />
-            </div>
-            <span className="text-lg font-bold text-on-surface">Resume Chef</span>
-          </div>
-          <a href={appUrl}>
-            <Button size="sm">
-              Open App
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </a>
-        </div>
-      </header>
-
-      <main className="flex-1">
-        <section className="max-w-[1440px] mx-auto px-4 md:px-10 py-16 md:py-24">
-          <div className="max-w-3xl">
-            <Badge />
-            <h1 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-on-surface leading-tight">
-              Build resumes that pass ATS and impress recruiters
-            </h1>
-            <p className="mt-6 text-lg text-on-surface-variant leading-relaxed">
-              Resume Chef combines a powerful code and visual editor, live PDF
-              preview, AI writing assistant, and ATS scoring — all in one
-              professional workspace.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href={appUrl}>
-                <Button size="lg">
-                  Start Building
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </a>
-              <Button variant="secondary" size="lg" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
-                See Features
-              </Button>
+    <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-surface">
+      <div className="max-w-4xl mx-auto space-y-12 py-8">
+        {/* Hero Section */}
+        <div className="text-center space-y-6">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 rounded-2xl bg-primary-bright/20 flex items-center justify-center">
+              <FileText className="w-10 h-10 text-primary" />
             </div>
           </div>
-        </section>
-
-        <section id="features" className="bg-surface-container-lowest border-y border-outline-variant">
-          <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-16">
-            <h2 className="text-2xl font-semibold text-on-surface mb-10">
-              Everything you need to craft the perfect resume
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {features.map((f) => (
-                <div
-                  key={f.title}
-                  className="p-6 rounded-2xl border border-outline-variant bg-surface hover:bg-surface-container-low transition-colors"
-                >
-                  <h3 className="text-lg font-semibold text-on-surface mb-2">
-                    {f.title}
-                  </h3>
-                  <p className="text-sm text-on-surface-variant leading-relaxed">
-                    {f.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="max-w-[1440px] mx-auto px-4 md:px-10 py-16 text-center">
-          <h2 className="text-2xl font-semibold text-on-surface mb-4">
-            Ready to cook up your next resume?
-          </h2>
-          <p className="text-on-surface-variant mb-8">
-            Access the workspace at{" "}
-            <code className="px-2 py-1 bg-surface-container rounded-lg text-sm">
-              app.localhost:5173
-            </code>
+          <h1 className="text-4xl md:text-5xl font-bold text-on-surface">
+            Craft Your Perfect Resume
+          </h1>
+          <p className="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+            Resume Chef helps you build professional resumes in minutes. Choose the builder that fits your style, leverage AI to refine your content, and export to PDF instantly.
           </p>
-          <a href={appUrl}>
-            <Button size="lg">
-              Launch Workspace
-              <ArrowRight className="w-5 h-5" />
+          <div className="flex items-center justify-center pt-4">
+            <Button size="lg" onClick={onNavigateToResumes} className="px-8 shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-transform">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Create your first resume
             </Button>
-          </a>
-        </section>
-      </main>
-
-      <footer className="border-t border-outline-variant py-6">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10 text-center text-sm text-on-surface-variant">
-          © {new Date().getFullYear()} Resume Chef
+          </div>
         </div>
-      </footer>
-    </div>
-  );
-}
 
-function Badge() {
-  return (
-    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-secondary-container text-primary">
-      AI-Powered Resume Builder
-    </span>
+        {/* Builder Types */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-semibold text-on-surface text-center">
+            Three Ways to Build
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="flex flex-col items-center text-center p-8 bg-surface-container-lowest border-outline-variant/50 hover:border-primary/30 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                <Code2 className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-on-surface mb-2">LaTeX Editor</h3>
+              <p className="text-sm text-on-surface-variant">
+                Full control over your resume layout with real-time compilation and syntax highlighting.
+              </p>
+            </Card>
+
+            <Card className="flex flex-col items-center text-center p-8 bg-surface-container-lowest border-outline-variant/50 hover:border-primary/30 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center mb-4">
+                <LayoutTemplate className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-on-surface mb-2">HTML Templates</h3>
+              <p className="text-sm text-on-surface-variant">
+                Modern web-based templates powered by HTML and CSS for beautiful designs.
+              </p>
+            </Card>
+
+            <Card className="flex flex-col items-center text-center p-8 bg-surface-container-lowest border-outline-variant/50 hover:border-primary/30 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                <MousePointerClick className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-on-surface mb-2">Drag & Drop</h3>
+              <p className="text-sm text-on-surface-variant">
+                Visual builder for quick and easy resume creation without touching any code.
+              </p>
+            </Card>
+          </div>
+        </div>
+
+        {/* Perks Section */}
+        <div className="bg-surface-container-low rounded-3xl p-8 md:p-12 border border-outline-variant/50">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-bold text-on-surface">
+                Why use Resume Chef?
+              </h2>
+              <ul className="space-y-4">
+                {[
+                  { title: "AI-Powered Assistance", desc: "Get smart suggestions and ATS scoring right in the editor." },
+                  { title: "Real-time Preview", desc: "See your changes instantly as you type or edit." },
+                  { title: "Cloud Sync", desc: "Your resumes are saved automatically and securely." },
+                  { title: "One-Click Export", desc: "Download pixel-perfect PDFs ready for your job applications." }
+                ].map((perk, i) => (
+                  <li key={i} className="flex gap-4">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">{perk.title}</h4>
+                      <p className="text-sm text-on-surface-variant">{perk.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-2xl transform rotate-3" />
+              <div className="relative bg-surface rounded-2xl shadow-xl border border-outline-variant p-6 h-64 flex items-center justify-center">
+                <Sparkles className="w-16 h-16 text-primary-bright opacity-50" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

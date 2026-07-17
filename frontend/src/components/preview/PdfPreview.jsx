@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from "react";
-import { RefreshCw, Download, FileText } from "lucide-react";
+import { RefreshCw, Download, FileText, Cloud } from "lucide-react";
 import { useResume } from "../../hooks/useResume";
 import {
   compileLatexToPdfUrl,
@@ -16,6 +16,8 @@ export default function PdfPreview() {
     setPreviewHtml,
     previewLoading,
     setPreviewLoading,
+    resumeTitle,
+    resumeFileName,
   } = useResume();
 
   const debounceRef = useRef(null);
@@ -53,7 +55,13 @@ export default function PdfPreview() {
     if (!previewHtml) return;
     const link = document.createElement("a");
     link.href = previewHtml;
-    link.download = "resume.pdf";
+    
+    let downloadName = resumeFileName || resumeTitle || "resume";
+    if (!downloadName.toLowerCase().endsWith(".pdf")) {
+      downloadName += ".pdf";
+    }
+    
+    link.download = downloadName;
     link.click();
   }
 
@@ -62,12 +70,16 @@ export default function PdfPreview() {
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-outline-variant shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <FileText className="w-4 h-4 text-primary shrink-0" />
-          <span className="text-sm font-semibold text-on-surface shrink-0">
-            Resume Preview
+          <span className="text-sm font-semibold text-on-surface shrink-0 max-w-[200px] truncate">
+            {resumeFileName || resumeTitle || "Resume Preview"}
           </span>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
+          <Button variant="ghost" size="sm">
+            <Cloud className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sync to cloud</span>
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -77,6 +89,7 @@ export default function PdfPreview() {
             <RefreshCw
               className={`w-3.5 h-3.5 ${previewLoading ? "animate-spin" : ""}`}
             />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
           <Button
             variant="secondary"
@@ -112,7 +125,7 @@ export default function PdfPreview() {
           ) : previewHtml ? (
             <iframe
               title="Resume PDF Preview"
-              src={previewHtml}
+              src={`${previewHtml}#toolbar=0`}
               className="border-0 block w-full h-full bg-white"
             />
           ) : (

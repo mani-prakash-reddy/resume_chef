@@ -5,6 +5,7 @@ import { useResume } from "../../hooks/useResume";
 import { chatWithAi } from "../../lib/api";
 import Button from "../ui/Button";
 import Strands from "../effects/Strands";
+import LlmMessage from "./LlmMessage";
 
 export default function AiChatWidget({ atsContext = null, onClearAtsContext }) {
   const { code, elements, resumeId, builderType } = useResume();
@@ -179,9 +180,15 @@ export default function AiChatWidget({ atsContext = null, onClearAtsContext }) {
                   : "bg-surface-container text-on-surface",
               )}
             >
-              {msg.content}
-              {msg.streaming && (
-                <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-current animate-pulse rounded-sm" />
+              {msg.role === "assistant" && !msg.isSystem ? (
+                <LlmMessage content={msg.content} isStreamFinished={!msg.streaming} />
+              ) : (
+                <>
+                  {msg.content}
+                  {msg.streaming && (
+                    <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-current animate-pulse rounded-sm" />
+                  )}
+                </>
               )}
             </div>
           ))}

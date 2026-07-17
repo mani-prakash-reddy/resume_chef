@@ -118,14 +118,12 @@ async def update_resume(
 
 
 @router.delete("/{resume_id}", status_code=204)
-async def archive_resume(
+async def delete_resume(
     resume_id: UUID,
     current_user: AuthUser = Depends(get_current_user),
     service: ResumeService = Depends(get_resume_service),
 ):
     """
-    Soft-delete (archive) a resume.
-    Archived resumes become read-only and don't count against the slot cap.
-    Pro users with lapsed subscriptions will have resumes above the cap archived, not deleted.
+    Hard-delete a resume.
     """
-    await service.archive_resume(resume_id=resume_id, user_id=current_user.id)
+    await service.delete_resume(resume_id=resume_id, user_id=current_user.id)

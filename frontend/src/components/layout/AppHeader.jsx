@@ -2,18 +2,19 @@ import { useState } from "react";
 import clsx from "clsx";
 import { ChefHat, Save, LogOut, User, Layout, FolderOpen, LayoutTemplate, Settings, ChevronDown } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useResume } from "../../hooks/useResume";
 import Button from "../ui/Button";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { id: "canvas", label: "Canvas", icon: Layout },
   { id: "resumes", label: "My Resumes", icon: FolderOpen },
-  { id: "templates", label: "Templates", icon: LayoutTemplate },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
 export default function AppHeader({ activeView, onViewChange }) {
   const { user, signOut } = useAuth();
+  const { resumeId } = useResume();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const displayName =
@@ -40,30 +41,31 @@ export default function AppHeader({ activeView, onViewChange }) {
         </div>
 
         <nav className="flex items-center gap-1" aria-label="Workspace">
-          {navItems.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onViewChange(id)}
-              className={clsx(
-                "flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer",
-                activeView === id
-                  ? "bg-secondary-container text-primary"
-                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low",
-              )}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="hidden md:inline">{label}</span>
-            </button>
-          ))}
+          {navItems.map(({ id, label, icon: Icon }) => {
+            const isDisabled = id === "canvas" && !resumeId;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => !isDisabled && onViewChange(id)}
+                disabled={isDisabled}
+                className={clsx(
+                  "flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer",
+                  isDisabled && "opacity-50 cursor-not-allowed",
+                  !isDisabled && activeView === id
+                    ? "bg-secondary-container text-primary"
+                    : !isDisabled && "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low",
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden md:inline">{label}</span>
+              </button>
+            );
+          })}
         </nav>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <Button variant="ghost" size="sm">
-          <Save className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Save</span>
-        </Button>
         <ThemeToggle />
 
         <div className="relative">
